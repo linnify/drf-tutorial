@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r"^", include("store.urls")),
     url(r"^", include("brand.urls")),
+    url(r"^", include("order.urls")),
     url(r"login$", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     url(r"^refresh-token$", TokenRefreshView.as_view(), name="token_refresh"),
 ]
