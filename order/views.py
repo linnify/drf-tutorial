@@ -1,9 +1,14 @@
+from django.utils.translation import gettext as _
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, \
     DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
+from order.filters import OrderFilter
 from order.models import Order, OrderItem
 from order.serializers import ReadOnlyOrderSerializer, CreateOrderSerializer, \
     OrderItemSerializer, UpdateOrderItemSerializer
@@ -20,6 +25,9 @@ class OrdersViewSet(
     serializer_class = ReadOnlyOrderSerializer
     permission_classes = (IsAuthenticated, IsOwnerUser)
     queryset = Order.objects.all()
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = OrderFilter
+    filter_fields = ("status",)
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
@@ -38,6 +46,13 @@ class OrdersViewSet(
     def create(self, request, *args, **kwargs):
         request.data["user"] = request.user.id
         return super().create(request, *args, **kwargs)
+
+    @action(methods=["GET"], detail=False, url_path="message")
+    def message(self, request):
+        sad = _("id5")
+        return Response(data={
+            sad
+        })
 
 
 class OrderItemsModelViewSet(ModelViewSet):
