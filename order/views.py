@@ -1,6 +1,5 @@
-from django.utils.translation import gettext as _
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.decorators import action
+from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, \
     DestroyModelMixin
@@ -47,23 +46,17 @@ class OrdersViewSet(
         request.data["user"] = request.user.id
         return super().create(request, *args, **kwargs)
 
-    @action(methods=["GET"], detail=False, url_path="message")
-    def message(self, request):
-        sad = _("id5")
-        return Response(data={
-            sad
-        })
-
 
 class OrderItemsModelViewSet(ModelViewSet):
     serializer_class = OrderItemSerializer
     queryset = OrderItem.objects.all()
+    permission_classes = (IsOwnerUser, IsAuthenticated)
 
     def get_queryset(self):
-        return OrderItem.objects.filter(
-            order__user=self.request.user,
-            order_id=self.kwargs.get("order_pk")
-        )
+        order = get_object_or_404(Order.objects.all(), id=self.kwargs.get("order_pk"))
+        self.check_object_permissions(self.request, order)
+
+        return order.items.all()
 
     def get_object(self):
         return get_object_or_404(self.get_queryset(), id=self.kwargs.get("pk"))
@@ -76,3 +69,17 @@ class OrderItemsModelViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         request.data["order"] = kwargs.get("order_pk")
         return super().create(request, *args, **kwargs)
+
+
+@api_view(["GET"])
+def raw_order(request):
+    orders = Order.raw_objects.raw_orders()
+    serializer = ReadOnlyOrderSerializer(instance=orders, many=True)
+    return Response(data=serializer.data)
+
+
+@api_view(["GET"])
+def raw_order_id(request, pk):
+    order = Order.raw_objects.raw_order_id(pk)
+    serializer = ReadOnlyOrderSerializer(instance=order)
+    return Response(data=serializer.data)

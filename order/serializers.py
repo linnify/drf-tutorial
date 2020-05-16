@@ -45,7 +45,8 @@ class OrderItemSerializer(ModelSerializer):
             stock = store.stocks.get(product_id=product_id).only("quantity")
             if quantity > stock.quantity:
                 raise ValidationError({
-                    "quantity": _(f"The quantity can not be greater than {stock.quantity}")
+                    "quantity": _(f"The quantity can not be greater"
+                                  f" than {stock.quantity}")
                 })
 
         except ObjectDoesNotExist:
@@ -61,7 +62,8 @@ class OrderItemSerializer(ModelSerializer):
         try:
             if store.brand_id != product.brand_id:
                 raise ValidationError({
-                    "product": _("The store brand and the product brand are not the same")
+                    "product": _("The store brand and the product brand are"
+                                 " not the same")
                 })
         except AttributeError:
             raise ValidationError({

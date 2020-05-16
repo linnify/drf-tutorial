@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from django.urls import include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested.routers import NestedDefaultRouter
 
@@ -18,4 +18,6 @@ orders_router.register(
 urlpatterns = [
     url(r"^", include(router.urls)),
     url(r"^", include(orders_router.urls)),
+    path(r"raw-orders", views.raw_order),
+    path(r"raw-orders/<int:pk>", views.raw_order_id)
 ]

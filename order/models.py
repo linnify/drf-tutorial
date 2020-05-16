@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Manager
 from django.utils.translation import gettext as _
 from brand.models import Product
+from order.managers import OrderManager
 from store.models import Store
 
 
@@ -21,6 +23,8 @@ class Order(models.Model):
     status = models.CharField(choices=STATUS, max_length=255, default=IN_PROGRESS)
     paid_amount = models.FloatField(validators=[MinValueValidator(0)], default=0)
     date = models.DateTimeField(auto_now_add=True)
+    objects = Manager()
+    raw_objects = OrderManager()
 
 
 class OrderItem(models.Model):
