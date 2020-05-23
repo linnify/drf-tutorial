@@ -22,6 +22,7 @@ class OrderManager(models.Manager):
     @profile
     def example_select_related_bad(self):
         orders = self.all()
+        print(orders.query)
         print("Example without select related")
         for order in orders:
             print("UserId", order.user.id)
@@ -29,6 +30,7 @@ class OrderManager(models.Manager):
     @profile
     def example_select_related_ok(self):
         orders = self.all().select_related("user")
+        print(orders.query)
         print("Example with select related")
         for order in orders:
             print("UserId", order.user.id)
@@ -39,20 +41,24 @@ class OrderManager(models.Manager):
 
     @profile
     def example_total_amount_paid(self):
-        total_paid_amount =  self.all().aggregate(total_paid_amount=Sum("paid_amount"))
+        total_paid_amount = self.all().aggregate(total_paid_amount=Sum("paid_amount")).get("total_paid_amount")
         print("Total paid Amount", total_paid_amount)
 
     @profile
     def example_count_bad(self):
+        queryset = self.all()
+        print("query", queryset.query)
         print("Count with len", len(self.all()))
 
     @profile
     def example_count_ok(self):
+        query = self.count()
+        print("query", query)
         print("Count", self.count())
 
     @profile
     def example_values_list(self):
-        print("Value List Flat True User Ids", self.all().values_list("user__id", flat=True))
+        print("Value List Flat True User Ids", self.all().values_list("user__username", "user__email"))
 
     @profile
     def example_values(self):
