@@ -1,6 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view
-from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, \
     DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -31,11 +30,6 @@ class OrdersViewSet(
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
-    def get_object(self):
-        instance = get_object_or_404(self.queryset, id=self.kwargs.get("pk"))
-        self.check_object_permissions(self.request, instance)
-        return instance
-
     def get_serializer_class(self):
         if self.action == "create":
             return CreateOrderSerializer
@@ -53,13 +47,7 @@ class OrderItemsModelViewSet(ModelViewSet):
     permission_classes = (IsOwnerUser, IsAuthenticated)
 
     def get_queryset(self):
-        order = get_object_or_404(Order.objects.all(), id=self.kwargs.get("order_pk"))
-        self.check_object_permissions(self.request, order)
-
-        return order.items.all()
-
-    def get_object(self):
-        return get_object_or_404(self.get_queryset(), id=self.kwargs.get("pk"))
+        return super().get_queryset().filter(order_pk=self.kwargs.get("order_pk"))
 
     def get_serializer_class(self):
         if self.action in ["update", "partial_update"]:

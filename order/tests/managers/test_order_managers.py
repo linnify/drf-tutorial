@@ -3,8 +3,6 @@ from django.test import TestCase
 from common.decorators import profile
 from order.models import Order
 from order.tests.factories import OrderFactory
-from store.tests.factories import StoreFactory
-from users.tests.factories import UserFactory
 
 
 class TestOrderManager(TestCase):
