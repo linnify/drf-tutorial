@@ -47,7 +47,7 @@ class OrderItemsModelViewSet(ModelViewSet):
     permission_classes = (IsOwnerUser, IsAuthenticated)
 
     def get_queryset(self):
-        return super().get_queryset().filter(order_pk=self.kwargs.get("order_pk"))
+        return super().get_queryset().filter(order_id=self.kwargs.get("order_pk"))
 
     def get_serializer_class(self):
         if self.action in ["update", "partial_update"]:
